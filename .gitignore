@@ -1,0 +1,21 @@
+# SQLite database and logs
+data/*.sqlite
+data/*.db
+*.sqlite
+*.db
+
+# Compressed archives
+*.zip
+*.tar.gz
+*.tgz
+*.rar
+*.7z
+
+# Temporary OS files
+.DS_Store
+Thumbs.db
+
+# Developer / task logs
+*.log
+.system_generated/
+scratch/

@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Red Chasqui · GAMLP</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link rel="stylesheet" href="../css/styles.css">
+</head>
+<body>
+  <script>
+    // Aplica el mismo tema (claro/oscuro) que el usuario eligió en la pantalla de inicio
+    document.body.dataset.theme = localStorage.getItem('chasqui-theme') === 'light' ? 'light' : 'dark';
+  </script>
+
+  <canvas id="particles-canvas"></canvas>
+
+  <!-- Navbar -->
+  <nav id="navbar">
+    <div class="nav-logo">
+      <a href="../index.html" class="nav-logo-mark" style="text-decoration:none" title="Volver a Red Chasqui"><i data-lucide="arrow-left" class="w-5 h-5"></i></a>
+      <div class="nav-logo-text">
+        <div class="title">Gestión de Residuos</div>
+        <div class="subtitle">Módulo Red Chasqui · GAMLP</div>
+      </div>
+    </div>
+
+    <ul class="nav-links" id="navLinks">
+      <li><a href="#" data-tab="mapa" class="active"><i data-lucide="map" class="w-3.5 h-3.5"></i> Mapa</a></li>
+      <li><a href="#" data-tab="horarios"><i data-lucide="calendar" class="w-3.5 h-3.5"></i> Horarios por Zona</a></li>
+      <li><a href="#" data-tab="registro"><i data-lucide="clipboard-list" class="w-3.5 h-3.5"></i> Reportes</a></li>
+    </ul>
+
+    <div class="nav-status">
+      <span class="live-dot"></span>
+      <span class="hidden md:inline" style="font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--muted)">EN VIVO</span>
+      <button id="theme-toggle" class="theme-toggle" title="Cambiar a modo claro" aria-label="Cambiar a modo claro">
+        <i data-lucide="moon" class="w-4 h-4"></i>
+      </button>
+      <a href="../index.html" class="btn btn-outline hidden md:inline-flex" style="padding:7px 14px; font-size:11.5px;"><i data-lucide="arrow-left" class="w-3.5 h-3.5"></i> Inicio</a>
+      <div class="nav-burger" id="navBurger" role="button" tabindex="0" aria-label="Abrir menú de navegación"><i data-lucide="menu" class="w-5 h-5"></i></div>
+    </div>
+  </nav>
+
+  <main>
+
+    <!-- MAPA -->
+    <div id="sub-mapa" class="subpage active w-full h-full relative">
+      <div id="map" class="w-full h-full"></div>
+
+      <!-- PANEL DE CONTROL GPS -->
+      <div class="map-overlay top-5 right-5 glass-card p-4 w-[280px] space-y-3" style="border-top:3px solid var(--green)">
+        <h4 class="font-bold text-[13.5px] text-white flex items-center gap-2">
+          <i data-lucide="truck" class="w-4 h-4 text-emerald-400"></i> Monitoreo LoRa
+        </h4>
+        <p class="text-[11px] leading-relaxed" style="color:var(--muted)">
+          Activa tu ubicación GPS para saber si el camión pasará hoy por tu zona y ver su cercanía.
+        </p>
+        
+        <button id="btn-gps-toggle" class="btn btn-green w-full justify-center text-[12.5px] py-2">
+          <i data-lucide="locate" class="w-4 h-4"></i> Activar mi GPS
+        </button>
+
+        <div id="gps-info-box" class="space-y-2 mt-2 pt-2 border-t border-white/5 hidden">
+          <div class="flex items-center justify-between text-[11.5px]">
+            <span style="color:var(--muted)">Zona detectada:</span>
+            <span id="detected-zone" class="font-semibold text-white">Sur (Calacoto)</span>
+          </div>
+          <div class="flex items-center justify-between text-[11.5px]">
+            <span style="color:var(--muted)">Servicio hoy:</span>
+            <span id="service-today-status" class="badge badge-green">PASA HOY</span>
+          </div>
+          <div class="flex items-center gap-1.5 text-[10.5px] pt-1" style="color:var(--faint)">
+            <i data-lucide="bell-ring" class="w-3 h-3"></i>
+            <span id="notif-status-text">Notificaciones: activando…</span>
+          </div>
+        </div>
+      </div>
+
+      <div id="proximity-alert" class="map-overlay top-5 left-5 glass-card p-4 max-w-xs hidden" style="border-left:3px solid var(--coral)">
+        <div class="flex items-start gap-3">
+          <div class="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0" style="background:rgba(255,92,92,0.14)">
+            <i data-lucide="bell" class="w-4 h-4" style="color:var(--coral)"></i>
+          </div>
+          <div>
+            <p class="font-semibold text-[13px]">Vecino, alista la basura, el camión ya está cerca</p>
+            <p class="text-[12px]" style="color:var(--muted)">Ruta Sur</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="map-overlay bottom-5 left-5 glass-card px-4 py-3 text-[11.5px] space-y-1.5">
+        <p class="badge badge-green mb-1.5">Leyenda</p>
+        <div class="flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full" style="background:#FFFFFF; border: 1.5px solid var(--gold);"></span> Tu ubicación (GPS)</div>
+        <div class="flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full" style="background:var(--green)"></span> Camión 1 (Verde)</div>
+        <div class="flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full" style="background:var(--sky)"></span> Camión 2 (Celeste)</div>
+        <div class="flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full" style="background:var(--gold)"></span> Camión 3 (Dorado)</div>
+        <div class="flex items-center gap-2"><span class="w-2.5 h-2.5 rounded" style="background:var(--green)"></span> Contenedor OK</div>
+        <div class="flex items-center gap-2"><span class="w-2.5 h-2.5 rounded" style="background:var(--coral)"></span> Contenedor lleno</div>
+        <div class="flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full" style="background:var(--coral)"></span> Reporte vecino</div>
+      </div>
+
+      <div id="relay-console" class="map-overlay bottom-5 right-5 glass-card p-3 max-w-[230px] max-h-[130px] overflow-y-auto text-[10.5px] font-mono hidden md:block space-y-1">
+        <p class="badge badge-gold mb-1">Enlace IoT (LoRa)</p>
+      </div>
+    </div>
+
+    <!-- HORARIOS POR ZONA -->
+    <div id="sub-horarios" class="subpage w-full h-full overflow-y-auto">
+      <div class="max-w-4xl mx-auto px-6 pb-10">
+        <div class="page-intro reveal">
+          <span class="page-badge">Cronograma Semanal</span>
+          <h2 class="page-heading">Horarios de Recolección por Zona</h2>
+          <p class="page-sub">Consulta los días y horas estimados de paso de los camiones recolectores en las principales zonas de la ciudad.</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+          <!-- Zona Sur -->
+          <div class="glass-card p-5 reveal flex flex-col justify-between" style="border-left: 3px solid var(--green)">
+            <div>
+              <div class="flex justify-between items-center mb-3">
+                <span class="badge badge-green">Zona Sur</span>
+                <span class="text-[11px] font-mono text-[var(--green)] font-semibold">PASA HOY</span>
+              </div>
+              <h3 class="text-[15px] font-bold mb-2">Calacoto, Obrajes, Irpavi, Achumani</h3>
+              <p class="text-[12.5px] text-muted mb-4">Recorrido por avenidas principales y calles residenciales de la cuenca sur.</p>
+            </div>
+            <div class="space-y-1.5 pt-3 border-t border-white/5 text-[12px]">
+              <div class="flex justify-between"><span class="text-muted">Días:</span><span class="font-semibold">Lunes, Miércoles, Viernes</span></div>
+              <div class="flex justify-between"><span class="text-muted">Horario aproximado:</span><span class="font-semibold">08:00 - 12:00</span></div>
+              <div class="flex justify-between"><span class="text-muted">Frecuencia:</span><span class="font-semibold">Interdiaria</span></div>
+            </div>
+          </div>
+
+          <!-- Zona Centro -->
+          <div class="glass-card p-5 reveal flex flex-col justify-between" style="border-left: 3px solid var(--faint)">
+            <div>
+              <div class="flex justify-between items-center mb-3">
+                <span class="badge" style="background:rgba(255,255,255,0.06); color:var(--muted)">Zona Centro</span>
+                <span class="text-[11px] font-mono text-muted">NO PASA HOY</span>
+              </div>
+              <h3 class="text-[15px] font-bold mb-2">Sopocachi, San Jorge, Centro</h3>
+              <p class="text-[12.5px] text-muted mb-4">Recolección nocturna en zonas de alta densidad residencial y comercial.</p>
+            </div>
+            <div class="space-y-1.5 pt-3 border-t border-white/5 text-[12px]">
+              <div class="flex justify-between"><span class="text-muted">Días:</span><span class="font-semibold">Martes, Jueves, Sábado</span></div>
+              <div class="flex justify-between"><span class="text-muted">Horario aproximado:</span><span class="font-semibold">19:00 - 23:00</span></div>
+              <div class="flex justify-between"><span class="text-muted">Frecuencia:</span><span class="font-semibold">Interdiaria (Nocturna)</span></div>
+            </div>
+          </div>
+
+          <!-- Zona Miraflores -->
+          <div class="glass-card p-5 reveal flex flex-col justify-between" style="border-left: 3px solid var(--green)">
+            <div>
+              <div class="flex justify-between items-center mb-3">
+                <span class="badge badge-green">Zona Este</span>
+                <span class="text-[11px] font-mono text-[var(--green)] font-semibold">PASA HOY</span>
+              </div>
+              <h3 class="text-[15px] font-bold mb-2">Miraflores, Villa Fátima, Pampahasi</h3>
+              <p class="text-[12.5px] text-muted mb-4">Cobertura matutina en laderas este y zonas aledañas.</p>
+            </div>
+            <div class="space-y-1.5 pt-3 border-t border-white/5 text-[12px]">
+              <div class="flex justify-between"><span class="text-muted">Días:</span><span class="font-semibold">Lunes a Sábado</span></div>
+              <div class="flex justify-between"><span class="text-muted">Horario aproximado:</span><span class="font-semibold">06:00 - 09:00</span></div>
+              <div class="flex justify-between"><span class="text-muted">Frecuencia:</span><span class="font-semibold">Diaria</span></div>
+            </div>
+          </div>
+
+          <!-- Zona Cotahuma -->
+          <div class="glass-card p-5 reveal flex flex-col justify-between" style="border-left: 3px solid var(--faint)">
+            <div>
+              <div class="flex justify-between items-center mb-3">
+                <span class="badge" style="background:rgba(255,255,255,0.06); color:var(--muted)">Zona Oeste</span>
+                <span class="text-[11px] font-mono text-muted">NO PASA HOY</span>
+              </div>
+              <h3 class="text-[15px] font-bold mb-2">Cotahuma, Llojeta, Max Paredes</h3>
+              <p class="text-[12.5px] text-muted mb-4">Rutas de recolección diurna en laderas oeste y zonas comerciales.</p>
+            </div>
+            <div class="space-y-1.5 pt-3 border-t border-white/5 text-[12px]">
+              <div class="flex justify-between"><span class="text-muted">Días:</span><span class="font-semibold">Martes, Jueves, Sábado</span></div>
+              <div class="flex justify-between"><span class="text-muted">Horario aproximado:</span><span class="font-semibold">08:00 - 12:00</span></div>
+              <div class="flex justify-between"><span class="text-muted">Frecuencia:</span><span class="font-semibold">Interdiaria</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- REGISTRO -->
+    <div id="sub-registro" class="subpage w-full h-full overflow-y-auto">
+      <div class="max-w-3xl mx-auto px-6 pb-10">
+        <div class="page-intro reveal">
+          <span class="page-badge">Reportes ciudadanos</span>
+          <h2 class="page-heading">Registra un incidente</h2>
+          <p class="page-sub">Cuéntanos qué está pasando en tu zona y lo enviamos directo a la cuadrilla.</p>
+        </div>
+
+        <div class="glass-card p-6 mt-5 reveal">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-[12px] font-semibold mb-1.5" style="color:var(--muted)">Tipo de reporte</label>
+              <select id="report-type">
+                <option>Contenedor lleno / rebalsando</option>
+                <option>Microbasural clandestino</option>
+                <option>Fuga de lixiviados</option>
+                <option>Camión no pasó</option>
+                <option>Otro</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-[12px] font-semibold mb-1.5" style="color:var(--muted)">Tu nombre (opcional)</label>
+              <input type="text" id="report-name" placeholder="Ej: Ana R." maxlength="60">
+            </div>
+          </div>
+          <div class="mt-4">
+            <label class="block text-[12px] font-semibold mb-1.5" style="color:var(--muted)">Descripción</label>
+            <textarea id="report-desc" rows="3" placeholder="Describe el problema, ubicación exacta..." maxlength="500"></textarea>
+          </div>
+          <div class="flex flex-wrap gap-3 mt-5">
+            <button id="btn-enviar-reporte" class="btn btn-green"><i data-lucide="send" class="w-4 h-4"></i> Enviar reporte</button>
+            <button class="btn btn-outline"><i data-lucide="camera" class="w-4 h-4"></i> Adjuntar foto</button>
+          </div>
+        </div>
+
+        <div class="glass-card p-6 mt-5 reveal">
+          <h3 class="text-[14px] font-bold mb-4">Últimos reportes vecinales</h3>
+          <div id="reports-list" class="timeline"></div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Elementos flotantes -->
+  <a href="https://wa.me/59100000000?text=Hola,%20quiero%20reportar%20un%20problema%20de%20recolecci%C3%B3n%20de%20residuos"
+     target="_blank" rel="noopener" class="whatsapp-fab" title="Reportar por WhatsApp" aria-label="Reportar por WhatsApp">
+    <i class="fab fa-whatsapp"></i>
+  </a>
+  <div class="back-top" id="backTop" title="Volver arriba" role="button" tabindex="0" aria-label="Volver arriba"><i class="fa fa-chevron-up"></i></div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="../js/particles.js"></script>
+  <script src="../js/background.js"></script>
+  <script src="config.js"></script>
+  <script src="../js/ui.js"></script>
+  <script src="../js/map.js"></script>
+  <script src="../js/containers.js"></script>
+  <script src="../js/reports.js"></script>
+  <script src="../js/app.js"></script>
+</body>
+</html>

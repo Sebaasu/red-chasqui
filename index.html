@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Red Chasqui · Gestión de Residuos LoRa/GPS · GAMLP</title>
+  <link rel="icon" type="image/png" href="LOGO.png">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link rel="stylesheet" href="css/styles.css">
+  <style>
+    /* Modal Styles */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(4, 10, 7, 0.85);
+      backdrop-filter: blur(8px);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+      animation: fadeIn 0.3s ease;
+    }
+    .modal-overlay.open {
+      display: flex;
+    }
+    .modal-content {
+      background: #0c1712;
+      border: 1px solid var(--border-strong);
+      border-radius: 24px;
+      max-width: 600px;
+      width: 90%;
+      padding: 30px;
+      position: relative;
+      box-shadow: 0 20px 50px rgba(34, 197, 94, 0.15);
+      animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    @keyframes slideUp {
+      from { transform: translateY(30px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+  </style>
+</head>
+<body class="landing-body" data-theme="dark">
+
+  <!-- Fondo dinámico: imágenes de La Paz en carrusel + overlay de tema -->
+  <div id="bg-slideshow" class="bg-slideshow"></div>
+  <div class="bg-overlay"></div>
+
+  <canvas id="particles-canvas"></canvas>
+
+  <!-- Navbar -->
+  <nav id="navbar">
+    <div class="nav-logo">
+      <img src="LOGO.png" alt="Logo Red Chasqui" class="nav-logo-img">
+      <div class="nav-logo-text">
+        <div class="title">Red Chasqui</div>
+        <div class="subtitle">Monitoreo de Residuos · LoRa · La Paz</div>
+      </div>
+    </div>
+    <div class="nav-status">
+      <span class="live-dot"></span>
+      <span style="font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--muted)">SISTEMA ACTIVO</span>
+      <button id="theme-toggle" class="theme-toggle" title="Cambiar a modo claro" aria-label="Cambiar a modo claro">
+        <i data-lucide="moon" class="w-4 h-4"></i>
+      </button>
+    </div>
+  </nav>
+
+  <main class="flex-1 overflow-y-auto w-full px-4 py-6">
+    <!-- HERO -->
+    <div class="hero-wrap mx-auto">
+      <span class="hero-badge"><i data-lucide="shield-check" class="w-3.5 h-3.5"></i> Gestión de Residuos GAMLP</span>
+      <h1 class="hero-title">Monitoreo de Basura en Tiempo Real</h1>
+      <p class="hero-desc">
+        Bienvenido a la <strong>Red Chasqui</strong>. Gracias a transmisores LoRa/GPS en los camiones recolectores, 
+        puedes ver la ubicación exacta del camión, verificar los horarios de recolección en tu zona 
+        y recibir alertas de proximidad para evitar dejar la basura en la calle antes de tiempo.
+      </p>
+
+      <!-- BOTONES DE ACCIÓN -->
+      <div class="flex flex-col sm:flex-row gap-4 justify-center items-center mt-8">
+        <a href="residuos/index.html" class="btn btn-green text-[15px] px-8 py-3 w-full sm:w-auto justify-center">
+          <i data-lucide="map-pin" class="w-5 h-5"></i> Ingresar como Usuario
+        </a>
+        <button id="btn-info" class="btn btn-outline text-[15px] px-8 py-3 w-full sm:w-auto justify-center">
+          <i data-lucide="info" class="w-5 h-5"></i> ¿Cómo funciona la red?
+        </button>
+      </div>
+
+      <div class="hero-stats mt-12">
+        <div class="glass-card hero-stat">
+          <div class="hero-stat-value" data-target="8">0</div>
+          <div class="hero-stat-label">Gateways LoRa</div>
+        </div>
+        <div class="glass-card hero-stat">
+          <div class="hero-stat-value" data-target="100" data-suffix="%">0</div>
+          <div class="hero-stat-label">Cobertura de Red</div>
+        </div>
+        <div class="glass-card hero-stat">
+          <div class="hero-stat-value" data-target="40" data-suffix=" seg">0</div>
+          <div class="hero-stat-label">Intervalo de Transmisión</div>
+        </div>
+        <div class="glass-card hero-stat">
+          <div class="hero-stat-value" data-target="0" data-suffix=" Bs/Mes">0</div>
+          <div class="hero-stat-label">Costo de Conectividad</div>
+        </div>
+      </div>
+
+      <!-- MENÚ DE MÓDULOS EN LA RED -->
+      <div class="module-grid mt-12 mb-12">
+        <!-- Gestión de Residuos (ACTIVO) -->
+        <div class="glass-card module-card featured" data-href="residuos/index.html">
+          <div class="module-icon" style="background:rgba(34,197,94,0.15)">
+            <i data-lucide="trash-2" class="w-5 h-5 text-green-400"></i>
+          </div>
+          <h3 class="module-title">Gestión de Residuos</h3>
+          <p class="module-desc">Monitoreo satelital en vivo, estado de contenedores y geocercas ciudadanas en tiempo real.</p>
+          <span class="module-status status-activo">Activo</span>
+        </div>
+
+        <!-- Monitoreo Antitrameaje (PRÓXIMAMENTE) -->
+        <div class="glass-card module-card" data-href="">
+          <div class="module-icon" style="background:rgba(245,185,66,0.15)">
+            <i data-lucide="route" class="w-5 h-5 text-yellow-400"></i>
+          </div>
+          <h3 class="module-title">Monitoreo Antitrameaje</h3>
+          <p class="module-desc">Control de recorridos obligatorios y tarifas del transporte público urbano municipal.</p>
+          <span class="module-status status-nucleo">Núcleo</span>
+        </div>
+
+        <!-- Alerta de Ríos (PRÓXIMAMENTE) -->
+        <div class="glass-card module-card" data-href="">
+          <div class="module-icon" style="background:rgba(255,255,255,0.06)">
+            <i data-lucide="waves" class="w-5 h-5 text-sky-400"></i>
+          </div>
+          <h3 class="module-title">Alerta de Ríos</h3>
+          <p class="module-desc">Sensores de nivel ultrasónicos LoRa en cabeceras de cuenca para prevención de desbordes.</p>
+          <span class="module-status status-proximo">Próximamente</span>
+        </div>
+
+        <!-- Optimización Vial (PRÓXIMAMENTE) -->
+        <div class="glass-card module-card" data-href="">
+          <div class="module-icon" style="background:rgba(255,255,255,0.06)">
+            <i data-lucide="traffic-cone" class="w-5 h-5 text-orange-400"></i>
+          </div>
+          <h3 class="module-title">Optimización Vial</h3>
+          <p class="module-desc">Detección de baches y monitoreo de tráfico pesado a través de sensores vibracionales.</p>
+          <span class="module-status status-proximo">Próximamente</span>
+        </div>
+
+        <!-- Alumbrado Inteligente (PRÓXIMAMENTE) -->
+        <div class="glass-card module-card" data-href="">
+          <div class="module-icon" style="background:rgba(255,255,255,0.06)">
+            <i data-lucide="lightbulb" class="w-5 h-5 text-amber-300"></i>
+          </div>
+          <h3 class="module-title">Alumbrado Inteligente</h3>
+          <p class="module-desc">Reportes automatizados de fallas de luminarias para su rápido mantenimiento.</p>
+          <span class="module-status status-proximo">Próximamente</span>
+        </div>
+
+        <!-- Seguridad Vehicular (PRÓXIMAMENTE) -->
+        <div class="glass-card module-card" data-href="">
+          <div class="module-icon" style="background:rgba(255,255,255,0.06)">
+            <i data-lucide="shield" class="w-5 h-5 text-red-400"></i>
+          </div>
+          <h3 class="module-title">Seguridad Vehicular</h3>
+          <p class="module-desc">Rastreadores antirrobo y telemetría de flotas municipales pesadas y de emergencia.</p>
+          <span class="module-status status-proximo">Próximamente</span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- MODAL DE INFORMACIÓN -->
+  <div id="info-modal" class="modal-overlay">
+    <div class="modal-content">
+      <button id="modal-close" class="absolute top-5 right-5 text-muted hover:text-white transition-colors">
+        <i data-lucide="x" class="w-6 h-6"></i>
+      </button>
+      
+      <div class="flex items-center gap-3 mb-6">
+        <div class="w-12 h-12 rounded-xl flex items-center justify-center bg-green-500/10 text-green-400">
+          <i data-lucide="radio-tower" class="w-6 h-6"></i>
+        </div>
+        <div>
+          <h3 class="text-xl font-bold text-white">¿Qué es la Red Chasqui?</h3>
+          <p class="text-xs text-emerald-500 font-semibold uppercase tracking-wider">Tecnología LoRa y GPS</p>
+        </div>
+      </div>
+
+      <div class="space-y-4 text-left text-sm text-muted leading-relaxed">
+        <p>
+          La <strong>Red Chasqui</strong> es una infraestructura municipal de largo alcance que utiliza tecnología de radiofrecuencia <strong>LoRaWAN</strong>. Permite enviar datos de geolocalización a grandes distancias con un consumo energético mínimo y sin depender de redes de telefonía móvil de pago.
+        </p>
+        
+        <div class="border-l-2 border-emerald-500 pl-4 py-1 my-3 bg-white/5 rounded-r-lg">
+          <h4 class="font-bold text-white mb-1">¿Cómo funciona el monitoreo?</h4>
+          <p class="text-xs">
+            Cada camión recolector lleva un transmisor GPS/LoRa que emite señales de ubicación. Estas señales son captadas por 8 antenas receptoras (Gateways) ubicadas en puntos estratégicos de La Paz y se procesan para mostrarse en el mapa.
+          </p>
+        </div>
+
+        <div class="space-y-2 mt-2">
+          <div class="flex gap-2">
+            <span class="text-emerald-400 font-bold">1.</span>
+            <p><strong>Evita microbasurales:</strong> Saca tus bolsas de residuos solo cuando el camión esté cerca, evitando que perros o el clima las dispersen.</p>
+          </div>
+          <div class="flex gap-2">
+            <span class="text-emerald-400 font-bold">2.</span>
+            <p><strong>Rastreo LoRa:</strong> Funciona incluso en zonas de topografía difícil o con cobertura celular débil.</p>
+          </div>
+        </div>
+      </div>
+      
+      <button id="modal-understand" class="btn btn-green w-full mt-6 justify-center">
+        ¡Entendido!
+      </button>
+    </div>
+  </div>
+
+  <script src="js/background.js"></script>
+  <script src="js/particles.js"></script>
+  <script src="js/landing.js"></script>
+  <script>
+    // Modal logic
+    const infoBtn = document.getElementById('btn-info');
+    const infoModal = document.getElementById('info-modal');
+    const closeBtn = document.getElementById('modal-close');
+    const understandBtn = document.getElementById('modal-understand');
+
+    function toggleModal(open) {
+      if (open) {
+        infoModal.classList.add('open');
+      } else {
+        infoModal.classList.remove('open');
+      }
+    }
+
+    infoBtn.addEventListener('click', () => toggleModal(true));
+    closeBtn.addEventListener('click', () => toggleModal(false));
+    understandBtn.addEventListener('click', () => toggleModal(false));
+    infoModal.addEventListener('click', (e) => {
+      if (e.target === infoModal) toggleModal(false);
+    });
+  </script>
+</body>
+</html>
