@@ -53,8 +53,9 @@ def init_db():
         );
     """)
     
-    # Cargar contenedores desde /home/gabriel/hackaton2026/coordenadas/contenedores.txt
-    cont_path = "/home/gabriel/hackaton2026/coordenadas/contenedores.txt"
+    # Cargar contenedores desde coordenadas/contenedores.txt del repositorio
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    cont_path = os.path.join(base_dir, "coordenadas", "contenedores.txt")
     contenedores_lista = []
     
     if os.path.exists(cont_path):
@@ -82,10 +83,10 @@ def init_db():
         cursor.execute("INSERT INTO contenedores (nombre, lat, lng, nivel) VALUES (?, ?, ?, ?)",
                        (nombre, c[0], c[1], nivel))
                        
-    # Cargar las tres rutas dibujadas manualmente por el usuario
-    r1_path = "/home/gabriel/hackaton2026/coordenadas/ruta1.txt"
-    r2_path = "/home/gabriel/hackaton2026/coordenadas/ruta2.txt"
-    r3_path = "/home/gabriel/hackaton2026/coordenadas/ruta3.txt"
+    # Cargar las tres rutas dibujadas manualmente por el usuario del repositorio
+    r1_path = os.path.join(base_dir, "coordenadas", "ruta1.txt")
+    r2_path = os.path.join(base_dir, "coordenadas", "ruta2.txt")
+    r3_path = os.path.join(base_dir, "coordenadas", "ruta3.txt")
     
     ruta1_json = None
     ruta2_json = None
