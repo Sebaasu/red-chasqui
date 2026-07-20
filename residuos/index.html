@@ -82,7 +82,39 @@
         </div>
       </div>
 
-      <div id="proximity-alert" class="map-overlay top-5 left-5 glass-card p-4 max-w-xs hidden" style="border-left:3px solid var(--coral)">
+      <!-- CLASIFICACIÓN DE RESIDUOS -->
+      <div class="map-overlay top-5 left-5 glass-card p-4 w-[260px] space-y-3" style="border-top:3px solid var(--sky)">
+        <h4 class="font-bold text-[13.5px] text-white flex items-center gap-2">
+          <i data-lucide="leaf" class="w-4 h-4 text-sky-400"></i> Separación en Origen
+        </h4>
+        <p class="text-[11px] leading-relaxed" style="color:var(--muted)">
+          Fomenta el reciclaje clasificando tus desechos. Filtra el mapa para localizar el contenedor adecuado:
+        </p>
+        <div class="flex flex-col gap-1.5" id="container-filters">
+          <button class="filter-pill active" onclick="filtrarContenedoresPorTipo('todos', this)">
+            <span style="width:7px; height:7px; border-radius:50%; background:#fff; display:inline-block"></span> Todos los contenedores
+          </button>
+          <button class="filter-pill" onclick="filtrarContenedoresPorTipo('plastico', this)">
+            <span style="width:7px; height:7px; border-radius:50%; background:#FBBF24; display:inline-block"></span> 🟡 Envases Plásticos
+          </button>
+          <button class="filter-pill" onclick="filtrarContenedoresPorTipo('papel', this)">
+            <span style="width:7px; height:7px; border-radius:50%; background:#3B82F6; display:inline-block"></span> 🔵 Papel y Cartón
+          </button>
+          <button class="filter-pill" onclick="filtrarContenedoresPorTipo('general', this)">
+            <span style="width:7px; height:7px; border-radius:50%; background:#10B981; display:inline-block"></span> 🟢 Islas Verdes (General)
+          </button>
+        </div>
+
+        <!-- Educación Ecológica no invasiva -->
+        <div class="border-t border-white/5 pt-2.5 mt-2">
+          <div id="eco-tip-box" class="rounded-lg p-2.5 text-[10.5px] leading-relaxed flex items-start gap-2 animate-pulse" style="background:rgba(16,185,129,0.04); border:1px solid rgba(16,185,129,0.1); color:#34D399;">
+            <i data-lucide="lightbulb" class="w-3.5 h-3.5 mt-0.5 flex-shrink-0" style="color:#34D399;"></i>
+            <div id="eco-tip-text">Separar residuos reduce el colapso del relleno sanitario municipal.</div>
+          </div>
+        </div>
+      </div>
+
+      <div id="proximity-alert" class="map-overlay top-[290px] left-5 glass-card p-4 max-w-xs hidden" style="border-left:3px solid var(--coral)">
         <div class="flex items-start gap-3">
           <div class="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0" style="background:rgba(255,92,92,0.14)">
             <i data-lucide="bell" class="w-4 h-4" style="color:var(--coral)"></i>

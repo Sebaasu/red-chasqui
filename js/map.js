@@ -91,20 +91,43 @@ const CHASQUI_MAP_MODULE = (() => {
         lucide.createIcons();
       });
     }
+    iniciarEcoTips();
   }
 
+  let containerMarkers = [];
+
   function dibujarContenedores(contenedores) {
+    // Limpiar marcadores existentes del mapa
+    containerMarkers.forEach(m => map.removeLayer(m));
+    containerMarkers = [];
+
     contenedores.forEach(c => {
-      const color = c.nivel >= 80 ? 'var(--coral)' : (c.nivel >= 50 ? 'var(--gold)' : 'var(--green)');
-      const colorGlow = c.nivel >= 80 ? 'rgba(255, 92, 92, 0.45)' : (c.nivel >= 50 ? 'rgba(245, 185, 66, 0.45)' : 'rgba(34, 197, 94, 0.45)');
+      // Determinar borde e información del contenedor según su tipo de reciclaje
+      let borderColor = '#10B981'; // Verde para general / Isla Verde
+      let glowColor = 'rgba(16, 185, 129, 0.45)';
+      let tipoTexto = 'Residuos Generales (Isla Verde)';
       
+      if (c.tipo === 'plastico') {
+        borderColor = '#FBBF24'; // Amarillo
+        glowColor = 'rgba(245, 185, 66, 0.45)';
+        tipoTexto = 'Envases y Botellas Plásticas';
+      } else if (c.tipo === 'papel') {
+        borderColor = '#3B82F6'; // Azul
+        glowColor = 'rgba(59, 130, 246, 0.45)';
+        tipoTexto = 'Papel y Cartón';
+      }
+
+      // Determinar color de fondo del badge circular en base a la capacidad (semáforo)
+      const statusColor = c.nivel >= 80 ? 'var(--coral)' : (c.nivel >= 50 ? 'var(--gold)' : 'var(--green)');
+      const isCriticalClass = c.nivel >= 80 ? 'is-full' : '';
+
       const containerIcon = L.divIcon({
         html: `
-          <div class="custom-container-marker ${c.nivel >= 80 ? 'is-full' : ''}" style="--border-color: ${color}; --glow-color: ${colorGlow}">
+          <div class="custom-container-marker ${isCriticalClass}" style="--border-color: ${borderColor}; --glow-color: ${glowColor}; border-color: ${borderColor} !important; box-shadow: 0 0 12px ${glowColor} !important;">
             <div class="container-image-container">
               <img src="../images/contenedor.jpeg" alt="Contenedor" class="container-marker-img">
             </div>
-            <div class="container-marker-badge" style="background: ${color}">
+            <div class="container-marker-badge" style="background: ${statusColor}">
               <span>${c.nivel}%</span>
             </div>
           </div>
@@ -115,11 +138,37 @@ const CHASQUI_MAP_MODULE = (() => {
         popupAnchor: [0, -20]
       });
 
-      L.marker([c.lat, c.lng], { icon: containerIcon })
+      const marker = L.marker([c.lat, c.lng], { icon: containerIcon })
         .addTo(map)
-        .bindPopup(`<b>${c.nombre}</b><br>Nivel de llenado: <b>${c.nivel}%</b><br>Estado: ${c.nivel >= 80 ? 'CRÍTICO (Lleno)' : (c.nivel >= 50 ? 'Medio' : 'Disponible')}`);
+        .bindPopup(`<b>Contenedor ${c.nombre}</b><br>
+                    Tipo: <b>${tipoTexto}</b><br>
+                    Llenado: <b>${c.nivel}%</b> (${c.nivel >= 80 ? 'CRÍTICO (Lleno)' : (c.nivel >= 50 ? 'Medio' : 'Disponible')})`);
+      
+      marker.tipoChasqui = c.tipo || 'general';
+      containerMarkers.push(marker);
     });
   }
+
+  // Función de filtrado global disponible en el objeto window
+  window.filtrarContenedoresPorTipo = function(tipo, btnElement) {
+    // Alternar clases en los botones de filtro
+    const filterContainer = document.getElementById('container-filters');
+    if (filterContainer) {
+      filterContainer.querySelectorAll('.filter-pill').forEach(btn => btn.classList.remove('active'));
+    }
+    if (btnElement) {
+      btnElement.classList.add('active');
+    }
+
+    // Filtrar marcadores en Leaflet
+    containerMarkers.forEach(marker => {
+      if (tipo === 'todos' || marker.tipoChasqui === tipo) {
+        if (!map.hasLayer(marker)) map.addLayer(marker);
+      } else {
+        if (map.hasLayer(marker)) map.removeLayer(marker);
+      }
+    });
+  };
 
   async function cargarContenedores() {
     try {
@@ -139,16 +188,48 @@ const CHASQUI_MAP_MODULE = (() => {
         [-16.497739, -68.132443], [-16.498767, -68.133967], [-16.497904, -68.137014], [-16.492903, -68.132186],
         [-16.490664, -68.140104], [-16.495621, -68.136971]
       ];
-      const fallbackContenedores = coords.map((c, idx) => ({
-        nombre: "C-" + (idx + 1).toString().padStart(2, '0'),
-        lat: c[0],
-        lng: c[1],
-        nivel: niveles[idx % niveles.length]
-      }));
+      const fallbackContenedores = coords.map((c, idx) => {
+        let tipo = 'general';
+        if (idx % 3 === 1) tipo = 'plastico';
+        else if (idx % 3 === 2) tipo = 'papel';
+        return {
+          nombre: "C-" + (idx + 1).toString().padStart(2, '0'),
+          lat: c[0],
+          lng: c[1],
+          nivel: niveles[idx % niveles.length],
+          tipo: tipo
+        };
+      });
       window.CHASQUI_CONTENEDORES = fallbackContenedores;
       dibujarContenedores(fallbackContenedores);
       document.dispatchEvent(new CustomEvent('chasqui:contenedores-listos', { detail: fallbackContenedores }));
     }
+  }
+
+  function iniciarEcoTips() {
+    const tips = [
+      "¿Sabías que separar el plástico reduce en un 80% la basura que llega a Alpacoma?",
+      "Enjuaga y aplasta tus botellas de plástico antes de arrojarlas en los contenedores amarillos 🟡.",
+      "El papel y cartón deben estar limpios y secos para depositarlos en los contenedores azules 🔵.",
+      "Clasificar los residuos orgánicos en las Islas Verdes 🟢 ayuda a compostar y nutrir las áreas verdes de La Paz.",
+      "Si todos clasificamos los residuos, extenderemos la vida útil del sistema de desechos de la ciudad por 15 años.",
+      "Alpacoma está por cerrar. Clasificar tus residuos hoy es cuidar el mañana de nuestra La Paz."
+    ];
+    let currentTipIdx = 0;
+    const ecoTipTextEl = document.getElementById('eco-tip-text');
+    if (!ecoTipTextEl) return;
+
+    ecoTipTextEl.textContent = tips[0];
+    ecoTipTextEl.style.transition = 'opacity 0.4s ease';
+    
+    setInterval(() => {
+      currentTipIdx = (currentTipIdx + 1) % tips.length;
+      ecoTipTextEl.style.opacity = '0';
+      setTimeout(() => {
+        ecoTipTextEl.textContent = tips[currentTipIdx];
+        ecoTipTextEl.style.opacity = '1';
+      }, 400);
+    }, 10000);
   }
 
   // Reduce la cantidad de puntos de una ruta densa manteniendo su forma general,

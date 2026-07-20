@@ -29,7 +29,8 @@ def init_db():
             nombre TEXT NOT NULL,
             lat REAL NOT NULL,
             lng REAL NOT NULL,
-            nivel INTEGER NOT NULL
+            nivel INTEGER NOT NULL,
+            tipo TEXT NOT NULL DEFAULT 'general'
         );
     """)
     cursor.execute("""
@@ -80,8 +81,13 @@ def init_db():
     for i, c in enumerate(contenedores_lista):
         nombre = f"C-{i+1:02d}"
         nivel = niveles[i % len(niveles)]
-        cursor.execute("INSERT INTO contenedores (nombre, lat, lng, nivel) VALUES (?, ?, ?, ?)",
-                       (nombre, c[0], c[1], nivel))
+        tipo = 'general'
+        if i % 3 == 1:
+            tipo = 'plastico'
+        elif i % 3 == 2:
+            tipo = 'papel'
+        cursor.execute("INSERT INTO contenedores (nombre, lat, lng, nivel, tipo) VALUES (?, ?, ?, ?, ?)",
+                       (nombre, c[0], c[1], nivel, tipo))
                        
     # Cargar las tres rutas dibujadas manualmente por el usuario del repositorio
     r1_path = os.path.join(base_dir, "coordenadas", "ruta1.txt")
@@ -177,7 +183,7 @@ class ChasquiHandler(http.server.SimpleHTTPRequestHandler):
         try:
             conn = sqlite3.connect(DB_PATH)
             cursor = conn.cursor()
-            cursor.execute("SELECT id, nombre, lat, lng, nivel FROM contenedores")
+            cursor.execute("SELECT id, nombre, lat, lng, nivel, tipo FROM contenedores")
             rows = cursor.fetchall()
             conn.close()
 
@@ -188,7 +194,8 @@ class ChasquiHandler(http.server.SimpleHTTPRequestHandler):
                     "nombre": r[1],
                     "lat": r[2],
                     "lng": r[3],
-                    "nivel": r[4]
+                    "nivel": r[4],
+                    "tipo": r[5]
                 })
             self.wfile.write(json.dumps(containers).encode('utf-8'))
         except Exception as e:
