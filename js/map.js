@@ -106,15 +106,18 @@ const CHASQUI_MAP_MODULE = (() => {
       let borderColor = '#10B981'; // Verde para general / Isla Verde
       let glowColor = 'rgba(16, 185, 129, 0.45)';
       let tipoTexto = 'Residuos Generales (Isla Verde)';
+      let imagenSrc = '../images/isla_verde.png';
       
       if (c.tipo === 'plastico') {
         borderColor = '#FBBF24'; // Amarillo
         glowColor = 'rgba(245, 185, 66, 0.45)';
         tipoTexto = 'Envases y Botellas Plásticas';
+        imagenSrc = '../images/contenedor-envases-plasticos.png';
       } else if (c.tipo === 'papel') {
         borderColor = '#3B82F6'; // Azul
         glowColor = 'rgba(59, 130, 246, 0.45)';
         tipoTexto = 'Papel y Cartón';
+        imagenSrc = '../images/contenedor-carton-papel.png';
       }
 
       // Determinar color de fondo del badge circular en base a la capacidad (semáforo)
@@ -125,7 +128,7 @@ const CHASQUI_MAP_MODULE = (() => {
         html: `
           <div class="custom-container-marker ${isCriticalClass}" style="--border-color: ${borderColor}; --glow-color: ${glowColor}; border-color: ${borderColor} !important; box-shadow: 0 0 12px ${glowColor} !important;">
             <div class="container-image-container">
-              <img src="../images/contenedor.jpeg" alt="Contenedor" class="container-marker-img">
+              <img src="${imagenSrc}" alt="Contenedor" class="container-marker-img">
             </div>
             <div class="container-marker-badge" style="background: ${statusColor}">
               <span>${c.nivel}%</span>
