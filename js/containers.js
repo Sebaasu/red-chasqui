@@ -7,11 +7,13 @@ document.addEventListener('chasqui:contenedores-listos', (e) => {
   cont.innerHTML = contenedores.map(c => {
     const color = c.nivel >= 80 ? 'var(--coral)' : (c.nivel >= 50 ? 'var(--gold)' : 'var(--green)');
     
-    let tipoBadge = '<span class="text-[9px] px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 ml-2">General</span>';
+    let tipoBadge = '<span class="text-[9px] px-1.5 py-0.5 rounded bg-gray-500/10 text-gray-400 border border-gray-500/20 ml-2">Común</span>';
     if (c.tipo === 'plastico') {
       tipoBadge = '<span class="text-[9px] px-1.5 py-0.5 rounded bg-yellow-500/10 text-yellow-400 border border-yellow-500/20 ml-2">Plástico</span>';
     } else if (c.tipo === 'papel') {
       tipoBadge = '<span class="text-[9px] px-1.5 py-0.5 rounded bg-blue-500/10 text-blue-400 border border-blue-500/20 ml-2">Papel</span>';
+    } else if (c.tipo === 'isla_verde') {
+      tipoBadge = '<span class="text-[9px] px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 ml-2">Isla Verde</span>';
     }
 
     return `

@@ -82,10 +82,12 @@ def init_db():
         nombre = f"C-{i+1:02d}"
         nivel = niveles[i % len(niveles)]
         tipo = 'general'
-        if i % 3 == 1:
+        if i % 4 == 1:
             tipo = 'plastico'
-        elif i % 3 == 2:
+        elif i % 4 == 2:
             tipo = 'papel'
+        elif i % 4 == 3:
+            tipo = 'isla_verde'
         cursor.execute("INSERT INTO contenedores (nombre, lat, lng, nivel, tipo) VALUES (?, ?, ?, ?, ?)",
                        (nombre, c[0], c[1], nivel, tipo))
                        

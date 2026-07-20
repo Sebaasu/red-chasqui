@@ -103,10 +103,10 @@ const CHASQUI_MAP_MODULE = (() => {
 
     contenedores.forEach(c => {
       // Determinar borde e información del contenedor según su tipo de reciclaje
-      let borderColor = '#10B981'; // Verde para general / Isla Verde
-      let glowColor = 'rgba(16, 185, 129, 0.45)';
-      let tipoTexto = 'Residuos Generales (Isla Verde)';
-      let imagenSrc = '../images/isla_verde.png';
+      let borderColor = '#9CA3AF'; // Gris para basura común (más común)
+      let glowColor = 'rgba(156, 163, 175, 0.45)';
+      let tipoTexto = 'Basura Común (No Clasificada)';
+      let imagenSrc = '../images/contenedor.jpeg'; // Imagen genérica original
       
       if (c.tipo === 'plastico') {
         borderColor = '#FBBF24'; // Amarillo
@@ -118,6 +118,11 @@ const CHASQUI_MAP_MODULE = (() => {
         glowColor = 'rgba(59, 130, 246, 0.45)';
         tipoTexto = 'Papel y Cartón';
         imagenSrc = '../images/contenedor-carton-papel.png';
+      } else if (c.tipo === 'isla_verde') {
+        borderColor = '#10B981'; // Verde
+        glowColor = 'rgba(16, 185, 129, 0.45)';
+        tipoTexto = 'Isla Verde (Reciclaje General)';
+        imagenSrc = '../images/isla_verde.png';
       }
 
       // Determinar color de fondo del badge circular en base a la capacidad (semáforo)
@@ -193,8 +198,9 @@ const CHASQUI_MAP_MODULE = (() => {
       ];
       const fallbackContenedores = coords.map((c, idx) => {
         let tipo = 'general';
-        if (idx % 3 === 1) tipo = 'plastico';
-        else if (idx % 3 === 2) tipo = 'papel';
+        if (idx % 4 === 1) tipo = 'plastico';
+        else if (idx % 4 === 2) tipo = 'papel';
+        else if (idx % 4 === 3) tipo = 'isla_verde';
         return {
           nombre: "C-" + (idx + 1).toString().padStart(2, '0'),
           lat: c[0],
