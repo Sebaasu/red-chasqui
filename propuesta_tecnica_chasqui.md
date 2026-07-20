@@ -43,8 +43,12 @@ Se construyeron nodos emisores autónomos listos para camión y contenedor, así
 
 ![Fotografía del prototipo del nodo emisor y receptor LoRa de desarrollo](images/foto_prototipo.jpg)
 
-### B. Aplicación Web Ciudadana (Interfaz en Tiempo Real)
-El portal web responsivo (Ecological Theme) renderiza los camiones activos moviéndose por calles paceñas reales y muestra el estado en "semáforo" (verde, amarillo y rojo parpadeante) de los 22 contenedores de Sopocachi en base a la telemetría real.
+### B. Aplicación Web Ciudadana (Interfaz en Tiempo Real y Clasificación)
+La plataforma web responsiva (Ecological Theme) renderiza los camiones activos en calles paceñas reales y gestiona el estado en semáforo de capacidad (verde, amarillo, y rojo parpadeante para nivel crítico) de los 22 contenedores de Sopocachi. Para alinear el proyecto con la crisis del relleno sanitario de Alpacoma, incorporamos:
+* **Separación en Origen de 4 Categorías:** Los contenedores en el mapa muestran imágenes reales diferenciadas según el tipo de residuo: Basura Común ⚪ (usando la foto del contenedor paceño tradicional `contenedor.jpeg` con borde gris), Envases Plásticos 🟡 (`contenedor-envases-plasticos.png` con borde amarillo), Papel y Cartón 🔵 (`contenedor-carton-papel.png` con borde azul) e Islas Verdes 🟢 (`isla_verde.png` con borde verde). El borde del marcador indica el tipo de reciclaje, y la etiqueta circular superior su capacidad de llenado.
+* **Filtro en Tiempo Real:** Un panel de control flotante permite filtrar en vivo los marcadores en el mapa Leaflet para ubicar al instante el depósito adecuado.
+* **Concientización Ecológica Activa:** Un widget de eco-consejos dinámicos de rotación automática (cada 10 segundos) educa de forma no invasiva sobre la reducción de volumen de Alpacoma, enjuague de plásticos y secado de papeles.
+* **Diseño Colapsable para Móvil:** Las tarjetas de control GPS y filtros de separación son colapsables y se contraen automáticamente al iniciar la aplicación en dispositivos móviles (< 768px), liberando el espacio de pantalla para la interacción vecinal en campo.
 
 ![Captura de pantalla de la interfaz de usuario en tiempo real y mapa de calor de contenedores](images/screenshot_app.png)
 

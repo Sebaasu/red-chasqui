@@ -6,7 +6,9 @@ Plataforma IoT municipal y red de telemetría de espectro libre (LoRaWAN) para l
 ## 1. Visión y Alcance del Proyecto
 La **Red Chasqui** es una infraestructura inteligente diseñada para la compleja topografía de La Paz. Propone el despliegue de gateways LoRaWAN propios de la alcaldía ubicados estratégicamente en los miradores de la hoyada, logrando **más de un 90% de cobertura urbana** con línea de vista directa (LOS).
 
-Aunque la red da soporte a múltiples verticales del Plan Integral La Paz 2050 (Movilidad Sostenible, Ciudad Inteligente, Gestión Vial y Prevención de Riesgos), se ha seleccionado el módulo de **Gestión de Residuos Sólidos** como nuestro **eje impulsor principal**. Esto se debe a su **impacto vecinal inmediato** y cotidiano en la población (notificaciones sonoras de proximidad del camión y estado de contenedores), permitiendo dejar instalada la red inalámbrica física sobre la cual correrán todos los demás servicios a costo marginal cero.
+Aunque la red da soporte a múltiples verticales del Plan Integral La Paz 2050 (Movilidad Sostenible, Ciudad Inteligente, Gestión Vial y Prevención de Riesgos), se ha seleccionado el módulo de **Gestión de Residuos Sólidos** como nuestro **eje impulsor principal**. Esto se debe a su **impacto vecinal inmediato** en la población (notificaciones sonoras de proximidad del camión y estado de contenedores).
+
+Para alinearnos directamente con la crisis de residuos y el inminente cierre del relleno de Alpacoma, la plataforma incorpora **Separación en Origen de 4 Categorías** (Basura Común ⚪, Plásticos 🟡, Papel/Cartón 🔵, Islas Verdes 🟢) mediante imágenes y bordes diferenciados en el mapa, acompañados de un banner dinámico de **eco-consejos** para concientización ciudadana. Toda la interfaz del mapa cuenta con **tarjetas colapsables** automáticas en teléfonos móviles para facilitar el uso vecinal en campo.
 
 ---
 
@@ -17,7 +19,7 @@ red-chasqui/
 ├── index.html                   → Portal de inicio de Red Chasqui (Menú de módulos)
 ├── server.py                    → Servidor HTTP de desarrollo en Python + Seeder SQLite
 ├── propuesta_tecnica_chasqui.md → Propuesta técnica formal para la hackatón
-├── pitch_chasqui.md             → Guía y estructura del pitch de 5 minutos (Presentación)
+├── pitch_chasqui.md             → Guía y estructura del pitch de 3 minutos (Presentación)
 ├── css/
 │   └── styles.css               → Estilos CSS unificados (Ecológicos / Oscuro y Claro)
 ├── js/
