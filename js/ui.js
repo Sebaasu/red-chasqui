@@ -164,6 +164,31 @@ const CHASQUI_UI = (() => {
     initAccesibilidadTeclado();
   }
 
+  // Toggle card helper
+  window.toggleCard = function(cardId) {
+    const card = document.getElementById(cardId);
+    if (!card) return;
+    card.classList.toggle('collapsed');
+    
+    // Cambiar la rotación del chevron
+    if (window.lucide) {
+      window.lucide.createIcons();
+    }
+  };
+
+  // Inicializar colapso en pantallas móviles
+  document.addEventListener('DOMContentLoaded', () => {
+    if (window.innerWidth < 768) {
+      setTimeout(() => {
+        const filterCard = document.getElementById('filter-card');
+        const gpsCard = document.getElementById('gps-card');
+        if (filterCard) filterCard.classList.add('collapsed');
+        if (gpsCard) gpsCard.classList.add('collapsed');
+        if (window.lucide) window.lucide.createIcons();
+      }, 300);
+    }
+  });
+
   return {
     switchTab, playNotificationSound, showToast, initNav, observarReveal, animarContadores, initBackToTop,
     solicitarPermisoNotificaciones, mostrarNotificacionSistema, estadoPermisoNotificaciones

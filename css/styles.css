@@ -1144,4 +1144,32 @@ body[data-theme="light"] .filter-pill.active {
   color: #0284c7 !important;
 }
 
+/* Tarjetas colapsables en el mapa */
+.collapsible-card {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.collapsible-card .card-header {
+  user-select: none;
+}
+.collapsible-card .card-body {
+  max-height: 500px;
+  opacity: 1;
+  overflow: visible;
+  transition: max-height 0.3s ease, opacity 0.2s ease, margin-top 0.3s ease;
+  margin-top: 12px;
+}
+.collapsible-card.collapsed .card-body {
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  margin-top: 0 !important;
+  pointer-events: none;
+}
+.collapsible-card .toggle-btn i {
+  transition: transform 0.25s ease;
+}
+.collapsible-card.collapsed .toggle-btn i {
+  transform: rotate(-180deg); /* Voltear la flecha si está colapsado */
+}
+
 

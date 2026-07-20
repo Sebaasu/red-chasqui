@@ -54,65 +54,82 @@
       <div id="map" class="w-full h-full"></div>
 
       <!-- PANEL DE CONTROL GPS -->
-      <div class="map-overlay top-5 right-5 glass-card p-4 w-[280px] space-y-3" style="border-top:3px solid var(--green)">
-        <h4 class="font-bold text-[13.5px] text-white flex items-center gap-2">
-          <i data-lucide="truck" class="w-4 h-4 text-emerald-400"></i> Monitoreo LoRa
-        </h4>
-        <p class="text-[11px] leading-relaxed" style="color:var(--muted)">
-          Activa tu ubicación GPS para saber si el camión pasará hoy por tu zona y ver su cercanía.
-        </p>
+      <!-- PANEL DE CONTROL GPS -->
+      <div id="gps-card" class="map-overlay top-5 right-5 glass-card p-3.5 w-[280px] collapsible-card" style="border-top:3px solid var(--green)">
+        <div class="flex items-center justify-between cursor-pointer card-header" onclick="toggleCard('gps-card')">
+          <h4 class="font-bold text-[13.5px] text-white flex items-center gap-2">
+            <i data-lucide="truck" class="w-4 h-4 text-emerald-400"></i> Monitoreo LoRa
+          </h4>
+          <button class="toggle-btn text-white/50 hover:text-white transition" aria-label="Colapsar panel de control GPS">
+            <i data-lucide="chevron-down" class="w-4 h-4"></i>
+          </button>
+        </div>
         
-        <button id="btn-gps-toggle" class="btn btn-green w-full justify-center text-[12.5px] py-2">
-          <i data-lucide="locate" class="w-4 h-4"></i> Activar mi GPS
-        </button>
+        <div class="card-body space-y-3">
+          <p class="text-[11px] leading-relaxed" style="color:var(--muted)">
+            Activa tu ubicación GPS para saber si el camión pasará hoy por tu zona y ver su cercanía.
+          </p>
+          
+          <button id="btn-gps-toggle" class="btn btn-green w-full justify-center text-[12.5px] py-2">
+            <i data-lucide="locate" class="w-4 h-4"></i> Activar mi GPS
+          </button>
 
-        <div id="gps-info-box" class="space-y-2 mt-2 pt-2 border-t border-white/5 hidden">
-          <div class="flex items-center justify-between text-[11.5px]">
-            <span style="color:var(--muted)">Zona detectada:</span>
-            <span id="detected-zone" class="font-semibold text-white">Sur (Calacoto)</span>
-          </div>
-          <div class="flex items-center justify-between text-[11.5px]">
-            <span style="color:var(--muted)">Servicio hoy:</span>
-            <span id="service-today-status" class="badge badge-green">PASA HOY</span>
-          </div>
-          <div class="flex items-center gap-1.5 text-[10.5px] pt-1" style="color:var(--faint)">
-            <i data-lucide="bell-ring" class="w-3 h-3"></i>
-            <span id="notif-status-text">Notificaciones: activando…</span>
+          <div id="gps-info-box" class="space-y-2 mt-2 pt-2 border-t border-white/5 hidden">
+            <div class="flex items-center justify-between text-[11.5px]">
+              <span style="color:var(--muted)">Zona detectada:</span>
+              <span id="detected-zone" class="font-semibold text-white">Sur (Calacoto)</span>
+            </div>
+            <div class="flex items-center justify-between text-[11.5px]">
+              <span style="color:var(--muted)">Servicio hoy:</span>
+              <span id="service-today-status" class="badge badge-green">PASA HOY</span>
+            </div>
+            <div class="flex items-center gap-1.5 text-[10.5px] pt-1" style="color:var(--faint)">
+              <i data-lucide="bell-ring" class="w-3 h-3"></i>
+              <span id="notif-status-text">Notificaciones: activando…</span>
+            </div>
           </div>
         </div>
       </div>
 
       <!-- CLASIFICACIÓN DE RESIDUOS -->
-      <div class="map-overlay top-5 left-5 glass-card p-4 w-[260px] space-y-3" style="border-top:3px solid var(--sky)">
-        <h4 class="font-bold text-[13.5px] text-white flex items-center gap-2">
-          <i data-lucide="leaf" class="w-4 h-4 text-sky-400"></i> Separación en Origen
-        </h4>
-        <p class="text-[11px] leading-relaxed" style="color:var(--muted)">
-          Fomenta el reciclaje clasificando tus desechos. Filtra el mapa para localizar el contenedor adecuado:
-        </p>
-        <div class="flex flex-col gap-1.5" id="container-filters">
-          <button class="filter-pill active" onclick="filtrarContenedoresPorTipo('todos', this)">
-            <span style="width:7px; height:7px; border-radius:50%; background:#fff; display:inline-block"></span> Todos los contenedores
-          </button>
-          <button class="filter-pill" onclick="filtrarContenedoresPorTipo('general', this)">
-            <span style="width:7px; height:7px; border-radius:50%; background:#9CA3AF; display:inline-block"></span> ⚪ Basura Común (General)
-          </button>
-          <button class="filter-pill" onclick="filtrarContenedoresPorTipo('plastico', this)">
-            <span style="width:7px; height:7px; border-radius:50%; background:#FBBF24; display:inline-block"></span> 🟡 Envases Plásticos
-          </button>
-          <button class="filter-pill" onclick="filtrarContenedoresPorTipo('papel', this)">
-            <span style="width:7px; height:7px; border-radius:50%; background:#3B82F6; display:inline-block"></span> 🔵 Papel y Cartón
-          </button>
-          <button class="filter-pill" onclick="filtrarContenedoresPorTipo('isla_verde', this)">
-            <span style="width:7px; height:7px; border-radius:50%; background:#10B981; display:inline-block"></span> 🟢 Islas Verdes
+      <div id="filter-card" class="map-overlay top-5 left-5 glass-card p-3.5 w-[260px] collapsible-card" style="border-top:3px solid var(--sky)">
+        <div class="flex items-center justify-between cursor-pointer card-header" onclick="toggleCard('filter-card')">
+          <h4 class="font-bold text-[13.5px] text-white flex items-center gap-2">
+            <i data-lucide="leaf" class="w-4 h-4 text-sky-400"></i> Separación en Origen
+          </h4>
+          <button class="toggle-btn text-white/50 hover:text-white transition" aria-label="Colapsar panel de separación en origen">
+            <i data-lucide="chevron-down" class="w-4 h-4"></i>
           </button>
         </div>
 
-        <!-- Educación Ecológica no invasiva -->
-        <div class="border-t border-white/5 pt-2.5 mt-2">
-          <div id="eco-tip-box" class="rounded-lg p-2.5 text-[10.5px] leading-relaxed flex items-start gap-2 animate-pulse" style="background:rgba(16,185,129,0.04); border:1px solid rgba(16,185,129,0.1); color:#34D399;">
-            <i data-lucide="lightbulb" class="w-3.5 h-3.5 mt-0.5 flex-shrink-0" style="color:#34D399;"></i>
-            <div id="eco-tip-text">Separar residuos reduce el colapso del relleno sanitario municipal.</div>
+        <div class="card-body space-y-3">
+          <p class="text-[11px] leading-relaxed" style="color:var(--muted)">
+            Fomenta el reciclaje clasificando tus desechos. Filtra el mapa para localizar el contenedor adecuado:
+          </p>
+          <div class="flex flex-col gap-1.5" id="container-filters">
+            <button class="filter-pill active" onclick="filtrarContenedoresPorTipo('todos', this)">
+              <span style="width:7px; height:7px; border-radius:50%; background:#fff; display:inline-block"></span> Todos los contenedores
+            </button>
+            <button class="filter-pill" onclick="filtrarContenedoresPorTipo('general', this)">
+              <span style="width:7px; height:7px; border-radius:50%; background:#9CA3AF; display:inline-block"></span> ⚪ Basura Común (General)
+            </button>
+            <button class="filter-pill" onclick="filtrarContenedoresPorTipo('plastico', this)">
+              <span style="width:7px; height:7px; border-radius:50%; background:#FBBF24; display:inline-block"></span> 🟡 Envases Plásticos
+            </button>
+            <button class="filter-pill" onclick="filtrarContenedoresPorTipo('papel', this)">
+              <span style="width:7px; height:7px; border-radius:50%; background:#3B82F6; display:inline-block"></span> 🔵 Papel y Cartón
+            </button>
+            <button class="filter-pill" onclick="filtrarContenedoresPorTipo('isla_verde', this)">
+              <span style="width:7px; height:7px; border-radius:50%; background:#10B981; display:inline-block"></span> 🟢 Islas Verdes
+            </button>
+          </div>
+
+          <!-- Educación Ecológica no invasiva -->
+          <div class="border-t border-white/5 pt-2.5 mt-2">
+            <div id="eco-tip-box" class="rounded-lg p-2.5 text-[10.5px] leading-relaxed flex items-start gap-2 animate-pulse" style="background:rgba(16,185,129,0.04); border:1px solid rgba(16,185,129,0.1); color:#34D399;">
+              <i data-lucide="lightbulb" class="w-3.5 h-3.5 mt-0.5 flex-shrink-0" style="color:#34D399;"></i>
+              <div id="eco-tip-text">Separar residuos reduce el colapso del relleno sanitario municipal.</div>
+            </div>
           </div>
         </div>
       </div>
